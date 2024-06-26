@@ -8,8 +8,11 @@ import java.util.List;
 @Data
 public class Deal implements Changeable {
     private String dealId;
+    @ComparableField(name = "dealName")
     private String dealName;
+    @ComparableField(name = "codes")
     private List<String> codes;
+    @ComparableField(name = "fees")
     private List<Fee> fees;
 
     private List<ChangeDetailVo> changeDetails = new ArrayList<>();
@@ -17,18 +20,6 @@ public class Deal implements Changeable {
     @Override
     public String getId() {
         return dealId;
-    }
-
-    @Override
-    public void compareAndRecordChanges(Object last, Object current) {
-        if (last instanceof Deal lastDeal && current instanceof Deal currentDeal) {
-            currentDeal.compareSimpleField(lastDeal.dealName, currentDeal.dealName, "dealName", lastDeal.changeDetails, currentDeal.changeDetails);
-            currentDeal.compareSimpleField(lastDeal.codes, currentDeal.codes, "codes", lastDeal.changeDetails, currentDeal.changeDetails);
-
-            var pair = compareList(lastDeal.fees, currentDeal.fees);
-            lastDeal.setFees(pair.getLeft());
-            currentDeal.setFees(pair.getRight());
-        }
     }
 
     @Override

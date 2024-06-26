@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class Response implements Changeable {
+    @ComparableField(name = "deal")
     private Deal deal;
     private List<Facility> facilities;
 
@@ -15,13 +16,6 @@ public class Response implements Changeable {
     @Override
     public String getId() {
         return deal.getDealId();
-    }
-
-    @Override
-    public void compareAndRecordChanges(Object last, Object current) {
-        if (last instanceof Response lastResponse && current instanceof Response currentResponse) {
-            currentResponse.compareSimpleField(lastResponse.deal, currentResponse.deal, "deal", null, null);
-        }
     }
 
     @Override
