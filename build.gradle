@@ -22,6 +22,11 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 	implementation 'org.jsoup:jsoup:1.17.2'
 
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+	testImplementation 'com.h2database:h2:2.1.214'
+	testImplementation 'org.springframework.batch:spring-batch-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
