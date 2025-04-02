@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sftp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sftp
+  template:
+    metadata:
+      labels:
+        app: sftp
+    spec:
+      initContainers:
+        - name: chown-hostkeys
+          image: busybox
+          command: ['sh', '-c', 'chown -R 0:0 /mnt/hostkeys']
+          volumeMounts:
+            - name: hostkeys
+              mountPath: /mnt/hostkeys
+      containers:
+        - name: sftp
+          image: your-registry/sftp:latest
+          ports:
+            - containerPort: 2222
+          volumeMounts:
+            - name: hostkeys
+              mountPath: /etc/ssh/host_keys
+            - name: sftp-users
+              mountPath: /etc/sftp-users
+          securityContext:
+            runAsUser: 0  # 需要 Root 权限处理用户创建
+      volumes:
+        - name: hostkeys
+          persistentVolumeClaim:
+            claimName: sftp-host-keys
+        - name: sftp-users
+          configMap:
+            name: sftp-users

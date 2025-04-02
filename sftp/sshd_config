@@ -1,0 +1,31 @@
+# 基础配置
+Port 2222
+Protocol 2
+HostKey /etc/ssh/host_keys/ssh_host_rsa_key
+HostKey /etc/ssh/host_keys/ssh_host_ed25519_key
+SyslogFacility AUTHPRIV
+LoginGraceTime 30
+MaxAuthTries 2
+MaxSessions 10
+
+# 安全限制
+PermitRootLogin no
+X11Forwarding no
+AllowTcpForwarding no
+PermitTTY no
+
+# 认证配置
+PasswordAuthentication no
+PubkeyAuthentication yes
+ChallengeResponseAuthentication no
+UsePAM no
+
+# SFTP 强制模式
+Subsystem sftp internal-sftp
+
+# 用户隔离规则
+Match Group sftpusers
+  ChrootDirectory /sftp-data/%u
+  ForceCommand internal-sftp
+  AllowAgentForwarding no
+  AuthorizedKeysFile /sftp-data/%u/.ssh/authorized_keys
