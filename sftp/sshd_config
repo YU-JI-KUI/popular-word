@@ -1,31 +1,34 @@
-# 基础配置
-Port 2222
-Protocol 2
-HostKey /etc/ssh/host_keys/ssh_host_rsa_key
-HostKey /etc/ssh/host_keys/ssh_host_ed25519_key
-SyslogFacility AUTHPRIV
-LoginGraceTime 30
-MaxAuthTries 2
-MaxSessions 10
+# 基础配置部分
+Port 2222                     # SSH 服务监听端口改为 2222（默认是 22）
+Protocol 2                    # 只使用 SSH 协议第 2 版（更安全）
 
-# 安全限制
-PermitRootLogin no
-X11Forwarding no
-AllowTcpForwarding no
-PermitTTY no
+# HostKey 是服务器的身份证明文件（类似网站的 SSL 证书）
+HostKey /etc/ssh/host_keys/ssh_host_rsa_key       # RSA 密钥文件路径
+HostKey /etc/ssh/host_keys/ssh_host_ed25519_key   # Ed25519 密钥文件路径
 
-# 认证配置
-PasswordAuthentication no
-PubkeyAuthentication yes
-ChallengeResponseAuthentication no
-UsePAM no
+SyslogFacility AUTHPRIV       # 日志记录到安全相关的日志分类
+LoginGraceTime 30             # 登录超时时间 30 秒
+MaxAuthTries 2                # 允许每连接最多尝试 2 次认证
+MaxSessions 10                # 每个网络连接最多允许 10 个会话
 
-# SFTP 强制模式
-Subsystem sftp internal-sftp
+# 安全限制部分
+PermitRootLogin no            # 禁止 root 用户登录（防止高危操作）
+X11Forwarding no              # 禁用图形界面转发（SFTP 不需要）
+AllowTcpForwarding no         # 禁用端口转发（防止滥用）
+PermitTTY no                  # 禁止分配终端（只允许文件传输）
 
-# 用户隔离规则
-Match Group sftpusers
-  ChrootDirectory /sftp-data/%u
-  ForceCommand internal-sftp
-  AllowAgentForwarding no
-  AuthorizedKeysFile /sftp-data/%u/.ssh/authorized_keys
+# 认证配置部分
+PasswordAuthentication no     # 完全禁用密码登录（只用密钥）
+PubkeyAuthentication yes      # 启用公钥认证
+ChallengeResponseAuthentication no  # 禁用挑战响应认证
+UsePAM no                     # 禁用 PAM 认证模块（简化配置）
+
+# SFTP 子系统配置
+Subsystem sftp internal-sftp  # 使用内置的 SFTP 实现（无需额外安装）
+
+# 用户隔离规则（针对 sftpusers 用户组的用户）
+Match Group sftpusers         # 匹配属于 sftpusers 组的用户
+  ChrootDirectory /sftp-data/%u  # 将用户限制在自己的目录（%u 代表用户名）
+  ForceCommand internal-sftp  # 强制用户只能使用 SFTP，不能执行其他命令
+  AllowAgentForwarding no     # 禁用 SSH 代理转发
+  AuthorizedKeysFile /sftp-data/%u/.ssh/authorized_keys  # 用户公钥存储路径
